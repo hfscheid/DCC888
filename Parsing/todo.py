@@ -66,6 +66,32 @@ def file2cfg_and_env(lines: list[str]) -> tuple[Env, list[Inst]]:
         9
     """
     # TODO: Imlement this method.
+
+    match_op = {
+        "add": Add,
+        "mul": Mul,
+        "lth": Lth,
+        "geq": Geq,
+    }
+
     env = line2env(lines[0])
     insts = []
+    bt_list = []
+    i = 0
+    for line in lines[1:]:
+        tokens = line.split()
+        if tokens[0] == "bt":
+            inst = Bt(tokens[1])
+            bt_list.append((inst, tokens[2], i))
+        else:
+            op = match_op[tokens[2]]
+            inst = op(tokens[0], tokens[3], tokens[4])
+        insts.append(inst)
+
+    for bt_tuple in bt_list:
+        bt = bt_tuple[0] 
+        bt.add_true_next(insts[int(bt_tuple[1])])
+
+    for i in range(len(insts)-1):
+        insts[i].add_next(insts[i+1])
     return (env, insts)
