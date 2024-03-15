@@ -67,7 +67,7 @@ Once you upload these three files, remember to clique on "*Avaliar*" (evaluate),
 
 ## Testing without Moodle
 
-In case you are not enrolled in DCC888, but still wants to try out the assignment, you can run it directly.
+In case you are not enrolled in DCC888, but still want to try out the assignment, you can run it directly.
 Except for [driver.py](driver.py), the other files use `doctests`, so that you can check that everything is correct doing:
 
 ```
