@@ -92,8 +92,11 @@ class Dominance_Eq(DataFlowEq):
             [0, 3]
         """
         # TODO: Implement this method.
-        return set()
-
+        dom = set([self.inst.ID])
+        pred_dom = UniversalSet()
+        for pred in self.inst.preds:
+            pred_dom = pred_dom & env[str(pred.ID)]
+        return dom.union(pred_dom)
 
     def name(self):
         """
@@ -150,7 +153,7 @@ def dominance_constraint_gen(insts):
         'D(3) = set(3) U Intersection( D(0), D(1), D(2) )'
     """
     # TODO: Implement this function.
-    return []
+    return [Dominance_Eq(inst) for inst in insts]
 
 
 class UniversalSet(set):
@@ -240,4 +243,9 @@ def abstract_interp(equations):
     """
     # TODO: Implement this function.
     env = {eq.name(): UniversalSet() for eq in equations}
+    someEval = True
+    while someEval is not False:
+        someEval = False
+        for eq in equations:
+            someEval = someEval or eq.eval(env)
     return env
