@@ -345,13 +345,17 @@ def build_dependence_graph(equations) -> dict[str, list[DataFlowEq]]:
         >>> i0.add_next(i1)
         >>> eqs = reaching_defs_constraint_gen([i0, i1])
         >>> deps = build_dependence_graph(eqs)
-        >>> deps['IN_1']
+        >>> [eq.name() for eq in deps['IN_1']]
         ['OUT_0']
     """
     # I have changed the doctest, since the reaching definition of the first IN
     # set should be empty
     # TODO: implement this method
-    dep_graph = {eq.name(): eq.deps() for eq in equations}
+    eq_map = {eq.name(): eq for eq in equations}
+    dep_graph = {
+        eq.name(): [eq_map[dep] for dep in eq.deps()]
+        for eq in equations
+    }
     return dep_graph
 
 
@@ -380,7 +384,7 @@ def abstract_interp_worklist(equations) -> tuple[Env, int]:
     env = defaultdict(list)
     dep_graph = build_dependence_graph(equations)
     worklist = equations.copy()
-    id_to_eq = {eq.name(): eq for eq in equations}
+    # id_to_eq = {eq.name(): eq for eq in equations}
 
     def affects(eq_name):
         affected = []
@@ -393,8 +397,11 @@ def abstract_interp_worklist(equations) -> tuple[Env, int]:
         eq = worklist.pop(0)
         if eq.eval(env):
             for dep in affects(eq.name()):
-                if id_to_eq[dep] in worklist:
-                    worklist.remove(id_to_eq[dep])
-                worklist.insert(0, id_to_eq[dep])
+                # if id_to_eq[dep] in worklist:
+                if dep in worklist:
+                    # worklist.remove(id_to_eq[dep])
+                    worklist.remove(dep)
+                # worklist.insert(0, id_to_eq[dep])
+                worklist.insert(0, dep)
 
     return (env, DataFlowEq.num_evals)
