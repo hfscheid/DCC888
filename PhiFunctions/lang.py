@@ -313,13 +313,9 @@ class PhiBlock(Inst):
             d = phi.definition()
             defs[d] = env.get(phi.uses()[self.selectors[PC]])
         # TODO: Assign all the uses:
-<<<<<<< HEAD
-        pass
-=======
         for phi in self.phis:
             d = phi.definition()
             env.set(d, defs[d])
->>>>>>> 39deac4 (feat: solved PhiFunctions)
 
     def __str__(self):
         block_str = "\n".join([str(phi) for phi in self.phis])
