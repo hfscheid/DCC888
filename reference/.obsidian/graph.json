@@ -1,0 +1,44 @@
+{
+  "collapse-filter": false,
+  "search": "path:deutsch  ",
+  "showTags": false,
+  "showAttachments": false,
+  "hideUnresolved": false,
+  "showOrphans": true,
+  "collapse-color-groups": true,
+  "colorGroups": [
+    {
+      "query": "tag:#activity  ",
+      "color": {
+        "a": 1,
+        "rgb": 16439552
+      }
+    },
+    {
+      "query": "path:deutsch/solutions  ",
+      "color": {
+        "a": 1,
+        "rgb": 11392604
+      }
+    },
+    {
+      "query": "tag:#resource  ",
+      "color": {
+        "a": 1,
+        "rgb": 14048348
+      }
+    }
+  ],
+  "collapse-display": true,
+  "showArrow": true,
+  "textFadeMultiplier": -3,
+  "nodeSizeMultiplier": 1.478125,
+  "lineSizeMultiplier": 1.01875,
+  "collapse-forces": false,
+  "centerStrength": 0,
+  "repelStrength": 18.125,
+  "linkStrength": 1,
+  "linkDistance": 30,
+  "scale": 0.9949074475139174,
+  "close": false
+}
