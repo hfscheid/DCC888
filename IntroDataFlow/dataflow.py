@@ -241,6 +241,13 @@ class LivenessAnalysisIN_Eq(IN_Eq):
             ['a', 'b']
         """
         # TODO: implement this method
+<<<<<<< HEAD
+=======
+        in_set = self.inst.uses().union(
+                data_flow_env[name_out(self.inst.ID)])
+        in_set = in_set - self.inst.definition()
+        return in_set
+>>>>>>> c0f2d5e (feat: solved IntroDataFlow)
 
     def __str__(self):
         """
@@ -275,6 +282,13 @@ class LivenessAnalysisOUT_Eq(OUT_Eq):
             ['a', 'c', 'd']
         """
         # TODO: implement this method
+<<<<<<< HEAD
+=======
+        in_sets = set()
+        for inst in self.inst.nexts:
+            in_sets = in_sets.union(data_flow_env[name_in(inst.ID)])
+        return in_sets
+>>>>>>> c0f2d5e (feat: solved IntroDataFlow)
 
     def __str__(self):
         """
@@ -332,7 +346,9 @@ def liveness_constraint_gen(insts: list[Inst]) -> list[DataFlowEq]:
         "IN_0: (OUT_0 - {'c'}) + ['a', 'b'] IN_1: (OUT_1 - {'d'}) + ['a', 'c']"
     """
     # TODO: implement this method.
-    return []
+    in_eqs = [LivenessAnalysisIN_Eq(i) for i in insts]
+    out_eqs = [LivenessAnalysisOUT_Eq(i) for i in insts]
+    return in_eqs + out_eqs
 
 
 def abstract_interp(equations):
