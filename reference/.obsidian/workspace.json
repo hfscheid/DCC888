@@ -8,24 +8,12 @@
         "type": "tabs",
         "children": [
           {
-            "id": "397b48d43da7a4f1",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "deutsch/model-language-de.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
             "id": "b35e5bd05ae512d0",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "deutsch/instructions/instructions-de.md",
+                "file": "deutsch/dataflow-de.md",
                 "mode": "source",
                 "source": false
               }
@@ -35,16 +23,11 @@
             "id": "9f6d8db07c7b8726",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "deutsch/solutions/parsing-solution-de.md",
-                "mode": "source",
-                "source": false
-              }
+              "type": "graph",
+              "state": {}
             }
           }
-        ],
-        "currentTab": 2
+        ]
       }
     ],
     "direction": "vertical"
@@ -110,7 +93,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "deutsch/solutions/parsing-solution-de.md",
+                "file": "deutsch/dataflow-de.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -127,7 +110,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "deutsch/solutions/parsing-solution-de.md",
+                "file": "deutsch/dataflow-de.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -150,7 +133,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "deutsch/solutions/parsing-solution-de.md"
+                "file": "deutsch/dataflow-de.md"
               }
             }
           }
@@ -171,16 +154,20 @@
       "command-palette:Befehlspalette öffnen": false
     }
   },
-  "active": "9f6d8db07c7b8726",
+  "active": "b35e5bd05ae512d0",
   "lastOpenFiles": [
-    "deutsch/model-language-de.md",
-    "deutsch/instructions/instructions-de.md",
-    "deutsch/solutions/parsing-solution-de.md",
-    "deutsch/instructions",
-    "deutsch/parsing-de.md",
+    "deutsch/vorlagen/activity-de.md",
     "deutsch/dataflow-de.md",
-    "deutsch/control-flow-de.md",
+    "deutsch/vorlagen",
+    "deutsch/instructions/instructions-de.md",
+    "deutsch/parsing-de.md",
+    "concepts/liveness-de.md",
+    "concepts",
     "deutsch/activities-de.md",
+    "deutsch/solutions/parsing-solution-de.md",
+    "deutsch/model-language-de.md",
+    "deutsch/instructions",
+    "deutsch/control-flow-de.md",
     "deutsch/solutions",
     "english/activities.md",
     "deutsch/model-language-de.md~",
@@ -189,7 +176,6 @@
     "deutsch/control-flow-de.md~",
     "deutsch/4913",
     "deutsch",
-    "english/control-flow.md~",
     "english/parsing.md",
     "english/model-language.md",
     "english/dataflow.md",
@@ -199,15 +185,12 @@
     "english/dataflow-de.md",
     "english/control-flow-de.md",
     "english/activities-de.md",
-    "english",
     "activities.md",
     "parsing-de.md",
     "dataflow-de.md",
     "activities-de.md",
     "control-flow-de.md",
     "model-language.md",
-    "model-language-de.md",
-    "dataflow.md",
-    "parsing.md"
+    "model-language-de.md"
   ]
 }
