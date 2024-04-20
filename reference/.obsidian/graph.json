@@ -5,20 +5,13 @@
   "showAttachments": false,
   "hideUnresolved": false,
   "showOrphans": true,
-  "collapse-color-groups": false,
+  "collapse-color-groups": true,
   "colorGroups": [
     {
       "query": "tag:#activity  ",
       "color": {
         "a": 1,
         "rgb": 16439552
-      }
-    },
-    {
-      "query": "path:deutsch/solutions  ",
-      "color": {
-        "a": 1,
-        "rgb": 11392604
       }
     },
     {
@@ -32,7 +25,14 @@
       "query": "tag:#menu",
       "color": {
         "a": 1,
-        "rgb": 15790320
+        "rgb": 43775
+      }
+    },
+    {
+      "query": "tag:#solution",
+      "color": {
+        "a": 1,
+        "rgb": 6084188
       }
     }
   ],
@@ -41,11 +41,11 @@
   "textFadeMultiplier": -3,
   "nodeSizeMultiplier": 1.478125,
   "lineSizeMultiplier": 2.88177083333333,
-  "collapse-forces": false,
-  "centerStrength": 0,
-  "repelStrength": 13.5416666666667,
+  "collapse-forces": true,
+  "centerStrength": 0.364583333333333,
+  "repelStrength": 15.3125,
   "linkStrength": 1,
   "linkDistance": 30,
-  "scale": 0.9949074475139174,
+  "scale": 1.3101436171529643,
   "close": false
 }

@@ -12,6 +12,6 @@ repräsentiert werden. Eine besondere Funktion, `interp(instruction, environment
 ist dafür zuständig, Programme auszuführen. Sie benötigt nicht nur das Programm
 selbst, sondern auch einen Zustand. Dieser wird als ein Dict[str, int] angegeben.
 
-[Implementation](./instructions/instructions-de)
+[[instructions|Implementation]]
 
 #resource 

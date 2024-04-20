@@ -4,27 +4,19 @@
     "type": "split",
     "children": [
       {
-        "id": "18ae7b6fe10e2734",
+        "id": "5396af8c16c9977d",
         "type": "tabs",
         "children": [
           {
-            "id": "b35e5bd05ae512d0",
+            "id": "0bdfc823e94f7be2",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "deutsch/dataflow-de.md",
+                "file": "deutsch/dataflow-equations.md",
                 "mode": "source",
                 "source": false
               }
-            }
-          },
-          {
-            "id": "9f6d8db07c7b8726",
-            "type": "leaf",
-            "state": {
-              "type": "graph",
-              "state": {}
             }
           }
         ]
@@ -93,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "deutsch/dataflow-de.md",
+                "file": "deutsch/dataflow-equations.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -110,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "deutsch/dataflow-de.md",
+                "file": "deutsch/dataflow-equations.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -133,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "deutsch/dataflow-de.md"
+                "file": "deutsch/dataflow-equations.md"
               }
             }
           }
@@ -154,43 +146,43 @@
       "command-palette:Befehlspalette öffnen": false
     }
   },
-  "active": "b35e5bd05ae512d0",
+  "active": "0bdfc823e94f7be2",
   "lastOpenFiles": [
-    "deutsch/vorlagen/activity-de.md",
-    "deutsch/dataflow-de.md",
-    "deutsch/vorlagen",
-    "deutsch/instructions/instructions-de.md",
-    "deutsch/parsing-de.md",
-    "concepts/liveness-de.md",
-    "concepts",
+    "deutsch/instructions.md",
+    "deutsch/dataflow-equations.md",
+    "deutsch/dataflow/dataflow.md",
+    "deutsch/in-eq.md",
+    "deutsch/parsing/parsing-solution.md",
+    "deutsch/parsing/parsing.md",
+    "deutsch/concepts/liveness.md",
+    "deutsch/model-language.md",
+    "deutsch/activities.md",
+    "deutsch/vorlagen/activity.md",
+    "deutsch/parsing/parsing-solution-file.md",
+    "deutsch/controlflow/control-flow.md",
+    "deutsch/dominators/dominators.md",
+    "deutsch/dominators",
+    "deutsch/phifunction/phifunction.md",
+    "deutsch/worklist/worklist.md",
+    "deutsch/solutions/parsing-solution.md",
+    "deutsch/instructions/instructions.md",
+    "deutsch/controlflow/control-flow-de.md",
     "deutsch/activities-de.md",
+    "deutsch/parsing/parsing-de.md",
+    "deutsch/dataflow/dataflow-de.md",
+    "deutsch/controlflow",
+    "deutsch/phifunction",
+    "deutsch/worklist",
+    "deutsch/dataflow",
     "deutsch/solutions/parsing-solution-de.md",
-    "deutsch/model-language-de.md",
-    "deutsch/instructions",
-    "deutsch/control-flow-de.md",
-    "deutsch/solutions",
-    "english/activities.md",
-    "deutsch/model-language-de.md~",
-    "english/model-language.md~",
-    "english/]",
-    "deutsch/control-flow-de.md~",
-    "deutsch/4913",
-    "deutsch",
-    "english/parsing.md",
-    "english/model-language.md",
-    "english/dataflow.md",
-    "english/control-flow.md",
-    "english/parsing-de.md",
-    "english/model-language-de.md",
-    "english/dataflow-de.md",
-    "english/control-flow-de.md",
-    "english/activities-de.md",
-    "activities.md",
-    "parsing-de.md",
-    "dataflow-de.md",
-    "activities-de.md",
-    "control-flow-de.md",
-    "model-language.md",
-    "model-language-de.md"
+    "deutsch/parsing",
+    "deutsch/introdataflow",
+    "deutsch/control-flow",
+    "deutsch/dataflow-de.md",
+    "resources/parsing-solution.md",
+    "resources",
+    "solutions/parsing-solution.md",
+    "solutions",
+    "deutsch/vorlagen/activity-de.md"
   ]
 }
