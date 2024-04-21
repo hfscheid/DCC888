@@ -8,12 +8,12 @@
         "type": "tabs",
         "children": [
           {
-            "id": "0bdfc823e94f7be2",
+            "id": "46cf47917d6ba96a",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "deutsch/dataflow-equations.md",
+                "file": "deutsch/phifunction/phifunction.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "deutsch/dataflow-equations.md",
+                "file": "deutsch/phifunction/phifunction.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "deutsch/dataflow-equations.md",
+                "file": "deutsch/phifunction/phifunction.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,16 +125,16 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "deutsch/dataflow-equations.md"
+                "file": "deutsch/phifunction/phifunction.md"
               }
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -146,24 +146,28 @@
       "command-palette:Befehlspalette öffnen": false
     }
   },
-  "active": "0bdfc823e94f7be2",
+  "active": "46cf47917d6ba96a",
   "lastOpenFiles": [
-    "deutsch/instructions.md",
-    "deutsch/dataflow-equations.md",
+    "deutsch/dominators/dominators.md",
     "deutsch/dataflow/dataflow.md",
+    "deutsch/dominators/dominator-equations.md",
+    "deutsch/parsing/parsing-solution-file.md",
+    "deutsch/worklist/abstract-interp-worklist.md",
+    "deutsch/worklist/worklist.md",
+    "deutsch/dataflow/dataflow-equations.md",
+    "deutsch/dataflow/constraint-gen-function.md",
+    "constraint-gen-function.md",
+    "deutsch/parsing/parsing.md",
+    "deutsch/activities.md",
+    "deutsch/instructions.md",
+    "deutsch/model-language.md",
     "deutsch/in-eq.md",
     "deutsch/parsing/parsing-solution.md",
-    "deutsch/parsing/parsing.md",
     "deutsch/concepts/liveness.md",
-    "deutsch/model-language.md",
-    "deutsch/activities.md",
     "deutsch/vorlagen/activity.md",
-    "deutsch/parsing/parsing-solution-file.md",
     "deutsch/controlflow/control-flow.md",
-    "deutsch/dominators/dominators.md",
     "deutsch/dominators",
     "deutsch/phifunction/phifunction.md",
-    "deutsch/worklist/worklist.md",
     "deutsch/solutions/parsing-solution.md",
     "deutsch/instructions/instructions.md",
     "deutsch/controlflow/control-flow-de.md",
@@ -178,11 +182,7 @@
     "deutsch/parsing",
     "deutsch/introdataflow",
     "deutsch/control-flow",
-    "deutsch/dataflow-de.md",
-    "resources/parsing-solution.md",
     "resources",
-    "solutions/parsing-solution.md",
-    "solutions",
-    "deutsch/vorlagen/activity-de.md"
+    "solutions"
   ]
 }

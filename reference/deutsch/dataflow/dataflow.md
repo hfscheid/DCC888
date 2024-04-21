@@ -6,9 +6,10 @@ Die Datenflussanalyse wurde als eine Klassenhierarchie implementiert, die die Kl
 
 Eine Beispiellösung wird schon vorgelegt, die [[concepts/reachingdefs|Reaching Definitions]] behandelt. Da können sich Studenten anschauen, wie man die Funktion `eval_aux` implementieren soll.
 ### Benötigt
-- [[parsing-solution-file|parsing]]
+- [[parsing-solution-file|Parsing]]
 - [[deutsch/model-language|Modellsprache]]
 ### Ergibt
-- [[deutsch/dataflow-equations|Dataflow Gleichungen]]
+- [[dataflow-equations|Dataflow Gleichungen]]
+- [[deutsch/dataflow/constraint-gen-function|Einschränkungserzeugendefunktion]]
 
 #activity

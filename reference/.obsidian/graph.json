@@ -1,11 +1,11 @@
 {
-  "collapse-filter": true,
-  "search": "path:deutsch  ",
+  "collapse-filter": false,
+  "search": "path:deutsch",
   "showTags": false,
   "showAttachments": false,
   "hideUnresolved": false,
   "showOrphans": true,
-  "collapse-color-groups": true,
+  "collapse-color-groups": false,
   "colorGroups": [
     {
       "query": "tag:#activity  ",
@@ -46,6 +46,6 @@
   "repelStrength": 15.3125,
   "linkStrength": 1,
   "linkDistance": 30,
-  "scale": 1.3101436171529643,
-  "close": false
+  "scale": 0.9373099048177457,
+  "close": true
 }
