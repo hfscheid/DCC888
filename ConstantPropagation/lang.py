@@ -211,6 +211,30 @@ class Phi(Inst):
         next_s = f"\n  N: {self.nexts[0].ID if len(self.nexts) > 0 else ''}"
         return inst_s + pred_s + next_s
 
+class Read(Inst):
+    """
+    The Read instruction introduces non-constant values to the program.
+    This blocking instruction requests a numerical input from the user.
+    """
+    def __init__(s, dst):
+        s.dst = dst
+        super().__init__()
+
+    def definition(s):
+        return s.dst
+
+    def uses(s):
+        return set()
+
+    def eval(s, env):
+        input_value = input(f'value for {s.dst}: ')
+        env.set(s.dst, int(input_value))
+
+    def __str__(self):
+        inst_s = f"{self.ID}: {self.dst} = INPUT"
+        pred_s = f"\n  P: {', '.join([str(inst.ID) for inst in self.preds])}"
+        next_s = f"\n  N: {self.nexts[0].ID if len(self.nexts) > 0 else ''}"
+        return inst_s + pred_s + next_s
 
 class PhiBlock(Inst):
     """
