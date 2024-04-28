@@ -76,7 +76,6 @@ class Env:
             >>> e.get_from_list(["b", "a"])
             4
         """
-        # TODO: Implement this method
         return 0
 
     def set(s, var, value):
@@ -524,15 +523,10 @@ def interp(instruction: Inst, environment: Env, PC=0):
         2
     """
     if instruction:
-        print("----------------------------------------------------------")
-        print(instruction)
-        environment.dump()
         if isinstance(instruction, PhiBlock):
-            # TODO: implement this part:
-            pass
+            instruction.eval(environment, PC)
         else:
-            # TODO: implement this part:
-            pass
+            instruction.eval(environment)
         return interp(instruction.get_next(), environment, instruction.ID)
     else:
         return environment
