@@ -1,0 +1,5 @@
+- [ ] Read operation implementieren
+- [ ] Einschränkungen mithilfe DataFlowEq implementieren (slide 60)
+- [ ] Doctest für SSA-Form Programme
+- [ ] Nebenfunktion zum Spärlichmachen des Codes implementieren
+- [ ] Doctest für non-SSA Programme
