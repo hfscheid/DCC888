@@ -93,6 +93,12 @@ class Env:
         for var, value in s.env:
             print(f"{var}: {value}")
 
+    def to_dict(s):
+        d = dict()
+        for var, value in reversed(s.env):
+            d[var] = value 
+        return d 
+
 
 class Inst(ABC):
     """
@@ -170,7 +176,7 @@ class Phi(Inst):
         super().__init__()
 
     def definition(s):
-        return s.dst
+        return {s.dst}
 
     def uses(s):
         return s.args
@@ -220,7 +226,7 @@ class Read(Inst):
         super().__init__()
 
     def definition(s):
-        return s.dst
+        return {s.dst}
 
     def uses(s):
         return set()
@@ -306,7 +312,7 @@ class PhiBlock(Inst):
             >>> sorted(aa.definition())
             ['a0', 'a1']
         """
-        return [phi.definition() for phi in self.phis]
+        return set([phi.definition() for phi in self.phis])
 
     def uses(self):
         """

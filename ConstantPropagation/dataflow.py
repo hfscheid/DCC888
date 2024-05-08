@@ -81,16 +81,6 @@ class DataFlowEq(ABC):
         return True if data_flow_env[self.name()] != old_env else False
 
 
-def name_in(ID):
-    """
-    The name of an IN set is always ID + _IN. Eg.:
-        >>> Inst.next_index = 0
-        >>> add = Add('x', 'a', 'b')
-        >>> name_in(add.ID)
-        'IN_0'
-    """
-    return f"IN_{ID}"
-
 class SparseDataFlowEq(DataFlowEq):
     """
     When dealing with SSA-Form programs a classical data-flow analysis is
@@ -102,8 +92,6 @@ class SparseDataFlowEq(DataFlowEq):
     This class inherits attributes from DataFlowEq.
     """
 
-    @classmethod
-    @abstractmethod
     def eval_aux(self, data_flow_env: dict):
         """
         This method determines how each concrete equation evaluates itself.
@@ -121,6 +109,12 @@ class SparseDataFlowEq(DataFlowEq):
         old_env = data_flow_env.copy()
         self.eval_aux(data_flow_env)
         return True if data_flow_env != old_env else False
+
+    def deps(self):
+        return {}
+
+    def name(self):
+        return '' 
 
 
 class SparseConstantPropagation(SparseDataFlowEq):
@@ -165,11 +159,11 @@ class SparseConstantPropagation(SparseDataFlowEq):
             return
 
         op = {
-            Add:    lambda: self.inst.src0 + self.inst.src1,
-            Mul:    lambda: self.inst.src0 * self.inst.src1,
+            Add:    lambda: data_flow_env[self.inst.src0] + data_flow_env[self.inst.src1],
+            Mul:    lambda: data_flow_env[self.inst.src0] * data_flow_env[self.inst.src1],
             Bt:     lambda: 'NAC',
-            Lth:    lambda: int(self.inst.src0 < self.isnt.src1),
-            Geq:    lambda: int(self.inst.src0 >= self.isnt.src1),
+            Lth:    lambda: int(data_flow_env[self.inst.src0] <  data_flow_env[self.isnt.src1]),
+            Geq:    lambda: int(data_flow_env[self.inst.src0] >= data_flow_env[self.isnt.src1]),
             Read:   lambda: 'NAC',
         }
 
@@ -188,7 +182,8 @@ def constant_prop_constraint_gen(instructions: list[Inst]):
     return [SparseConstantPropagation(i) for i in instructions]
 
 
-def abstract_interp(equations):
+# TODO: explay why env
+def abstract_interp(equations, program_env: Env):
     """
     This function iterates on the equations, solving them in the order in which
     they appear. It returns an environment with the solution to the data-flow
@@ -196,17 +191,29 @@ def abstract_interp(equations):
 
     Example for reaching-definition analysis:
         >>> Inst.next_index = 0
-        >>> i0 = Add('c', 'a', 'b')
-        >>> i1 = Mul('d', 'c', 'a')
+        >>> env = Env({'zero': 0, 'one': 1})
+        >>> i0 = Add('a0', 'one', 'zero')
+        >>> i1 = Read('b0')
+        >>> i2 = Mul('c0', 'a0', 'b0')
+        >>> i3 = Add('a1', 'a0', 'a0')
+        >>> i4 = Add('a2', 'a1', 'c0')
         >>> i0.add_next(i1)
-        >>> eqs = constant_prop_constraint_gen([i0, i1])
-        >>> (sol, num_evals) = abstract_interp(eqs)
+        >>> i1.add_next(i2)
+        >>> i2.add_next(i3)
+        >>> i3.add_next(i4)
+        >>> eqs = constant_prop_constraint_gen([i0, i1, i2, i3, i4])
+        >>> (sol, num_evals) = abstract_interp(eqs, env)
+        >>> sorted(sol.items())
+        [('a0', 1), ('a1', 2), ('a2', 'NAC'), ('b0', 'NAC'), ('c0', 'NAC'), ('one', 1), ('zero', 0)]
+
     """
     from functools import reduce
 
+    
+
     DataFlowEq.num_evals = 0
-    env = {eq.name(): set() for eq in equations}
     changed = True
+    env = program_env.to_dict()
     while changed:
         changed = reduce(lambda acc, eq: eq.eval(env) or acc, equations, False)
     return (env, DataFlowEq.num_evals)
