@@ -13,10 +13,10 @@ As an example, the program below sums up the numbers a, b and c:
     l2 = x = add x c
 """
 
-from lang import *
+from lang import Env, Inst, Add, Mul, Lth, Geq, Read, Phi, Bt
 
 
-def line2env(line):
+def line2env(line: str) -> Env:
     """
     Maps a string (the line) to a dictionary in python. This function will be
     useful to read the first line of the text file. This line contains the
@@ -36,7 +36,7 @@ def line2env(line):
     return env_lang
 
 
-def file2cfg_and_env(lines):
+def file2cfg_and_env(lines: list[str]) -> tuple[Env, list[Inst]]:
     """
     Builds a control-flow graph representation for the strings stored in
     `lines`. The first string represents the environment. The other strings
@@ -65,13 +65,13 @@ def file2cfg_and_env(lines):
         >>> interp(prog[0], env).get("x")
         9
     """
-    # TODO: Imlement this method.
 
     match_op = {
-        "add": Add,
-        "mul": Mul,
-        "lth": Lth,
-        "geq": Geq,
+        "add":  Add,
+        "mul":  Mul,
+        "lth":  Lth,
+        "geq":  Geq,
+        "rd":   Read,
     }
 
     env = line2env(lines[0])
@@ -85,7 +85,7 @@ def file2cfg_and_env(lines):
             bt_list.append((inst, tokens[2], i))
         else:
             op = match_op[tokens[2]]
-            inst = op(tokens[0], tokens[3], tokens[4])
+            inst = op(tokens[0], *tokens[3:])
         insts.append(inst)
 
     for bt_tuple in bt_list:
