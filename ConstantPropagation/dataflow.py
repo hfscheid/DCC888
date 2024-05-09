@@ -158,18 +158,30 @@ class SparseConstantPropagation(SparseDataFlowEq):
         if type(self.inst) is Bt:
             return
 
-<<<<<<< HEAD
+        def equal_env(acc_and_x, y):
+            new_acc = acc_and_x[0] and \
+                      data_flow_env.get(acc_and_x[1]) == data_flow_env.get(y)
+            new_x = y
+            return(new_acc, new_x)
+
         op = {
-            Add:    lambda: data_flow_env.get(self.inst.src0) +
-                            data_flow_env.get(self.inst.src1),
-            Mul:    lambda: data_flow_env.get(self.inst.src0) *
-                            data_flow_env.get(self.inst.src1),
-            Bt:     lambda: 'NAC',
-            Lth:    lambda: int(data_flow_env.get(self.inst.src0) <
-                                data_flow_env.get(self.isnt.src1)),
-            Geq:    lambda: int(data_flow_env.get(self.inst.src0) >=
-                                data_flow_env.get(self.isnt.src1)),
-            Read:   lambda: 'NAC',
+            Add:        lambda: data_flow_env.get(self.inst.src0) +
+                                data_flow_env.get(self.inst.src1),
+            Mul:        lambda: data_flow_env.get(self.inst.src0) *
+                                data_flow_env.get(self.inst.src1),
+            Bt:         lambda: 'NAC',
+            Lth:        lambda: int(data_flow_env.get(self.inst.src0) <
+                                    data_flow_env.get(self.isnt.src1)),
+            Geq:        lambda: int(data_flow_env.get(self.inst.src0) >=
+                                    data_flow_env.get(self.isnt.src1)),
+            Read:       lambda: 'NAC',
+            Phi:        lambda: data_flow_env.get(self.inst.uses().pop()) \
+                                if reduce(
+                                    equal_env,
+                                    list(self.inst.uses()),
+                                    (True, self.inst.uses().pop())
+                                )
+                                else 'NAC',
         }
 
         vs = self.inst.uses()
