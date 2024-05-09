@@ -1,5 +1,6 @@
-from lang import Env, Inst, BinOp, Bt, Add, Read, Mul, Lth, Geq
+from lang import Env, Inst, BinOp, Bt, Add, Read, Mul, Lth, Geq, Phi
 from abc import ABC, abstractmethod
+from functools import reduce
 
 
 class DataFlowEq(ABC):
@@ -108,7 +109,14 @@ class SparseDataFlowEq(DataFlowEq):
         DataFlowEq.num_evals += 1
         old_env = data_flow_env.to_dict()
         self.eval_aux(data_flow_env)
-        return True if data_flow_env.to_dict() != old_env else False
+        if data_flow_env.to_dict() != old_env:
+            # debugging
+            # set1 = set(old_env.items())
+            # set2 = set(data_flow_env.to_dict().items())
+            # print(set1 ^ set2)
+            return True
+        else:
+            return False
 
     def deps(self):
         return {}
@@ -160,9 +168,10 @@ class SparseConstantPropagation(SparseDataFlowEq):
 
         def equal_env(acc_and_x, y):
             new_acc = acc_and_x[0] and \
-                      data_flow_env.get(acc_and_x[1]) == data_flow_env.get(y)
+                      data_flow_env.get_from_list(acc_and_x[1]) == \
+                      data_flow_env.get_from_list(y)
             new_x = y
-            return(new_acc, new_x)
+            return (new_acc, new_x)
 
         op = {
             Add:        lambda: data_flow_env.get(self.inst.src0) +
@@ -171,24 +180,29 @@ class SparseConstantPropagation(SparseDataFlowEq):
                                 data_flow_env.get(self.inst.src1),
             Bt:         lambda: 'NAC',
             Lth:        lambda: int(data_flow_env.get(self.inst.src0) <
-                                    data_flow_env.get(self.isnt.src1)),
+                                    data_flow_env.get(self.inst.src1)),
             Geq:        lambda: int(data_flow_env.get(self.inst.src0) >=
-                                    data_flow_env.get(self.isnt.src1)),
+                                    data_flow_env.get(self.inst.src1)),
             Read:       lambda: 'NAC',
-            Phi:        lambda: data_flow_env.get(self.inst.uses().pop()) \
+            Phi:        lambda: data_flow_env.get_from_list(list(self.inst.uses())) \
                                 if reduce(
                                     equal_env,
                                     list(self.inst.uses()),
-                                    (True, self.inst.uses().pop())
-                                )
+                                    (True, list(self.inst.uses())[0])
+                                )[0]
                                 else 'NAC',
         }
 
         vs = self.inst.uses()
         for v in vs:
-            if data_flow_env.get(v) == 'NAC':
-                data_flow_env.set(self.inst.definition().pop(), 'NAC')
-                return
+            if type(self.inst) is Phi:
+                if data_flow_env.get_from_list(v) == 'NAC':
+                    data_flow_env.set(self.inst.definition().pop(), 'NAC')
+                    return
+            else:
+                if data_flow_env.get(v) == 'NAC':
+                    data_flow_env.set(self.inst.definition().pop(), 'NAC')
+                    return
 
         data_flow_env.set(
                 self.inst.definition().pop(),

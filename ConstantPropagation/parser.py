@@ -72,6 +72,7 @@ def file2cfg_and_env(lines: list[str]) -> tuple[Env, list[Inst]]:
         "lth":  Lth,
         "geq":  Geq,
         "rd":   Read,
+        "phi":  Phi,
     }
 
     env = line2env(lines[0])
