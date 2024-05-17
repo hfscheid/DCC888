@@ -82,7 +82,7 @@ class DataFlowEq(ABC):
         return True if data_flow_env[self.name()] != old_env else False
 
 
-class SparseDataFlowEq(DataFlowEq):
+class SparseConstantPropagationEq(DataFlowEq):
     """
     When dealing with SSA-Form programs a classical data-flow analysis is
     somewhat cumbersome. Since every variable is associated with a single
@@ -90,13 +90,27 @@ class SparseDataFlowEq(DataFlowEq):
     across all program points. Thus, each instruction contributes to this state
     by defining the state of their own involved variable.
 
-    This class inherits attributes from DataFlowEq.
+    This class implements the sparse analysis for Constant
+    Propagation. Since we assume an input program is in SSA Form, 
+    there is no further need for IN and OUT sets for each instruction.
+    Instead, each variable is associated with one state by the end of the
+    Analysis.
     """
 
     def eval_aux(self, data_flow_env: Env):
         """
-        This method determines how each concrete equation evaluates itself.
-        Note that now the the reveived state is updated locally.
+        The evaluation of the meet operation over constant propagation follows
+        the lattice:
+                Not-a-constant (NAC)
+              /   /   /  | \  \  \ 
+            ... -c2 -c1 c0 c1 c2 ... 
+              \   \   \  | /  /  /  
+                Undefined (UNDEF)
+
+        Whereby variables start UNDEF untill value assignment, operations with
+        constants do not move them up the lattice and operations with NACs turn
+        them into NACs as well.
+
         """
         raise NotImplementedError
 
@@ -125,47 +139,100 @@ class SparseDataFlowEq(DataFlowEq):
         return '' 
 
 
-class SparseConstantPropagation(SparseDataFlowEq):
-    """
-    This concrete class implements the sparse analysis for Constant
-    Propagation. Since we assume an input program is in SSA Form, 
-    there is no further need for IN and OUT sets for each instruction.
-    Instead, each variable is associated with one state by the end of the
-    Analysis.
-    """
+class BranchEq(SparseConstantPropagationEq):
+    def eval_aux(self, data_flow_env: Env):
+        return
 
+
+class BinOpEq(SparseConstantPropagationEq):
     def eval_aux(self, data_flow_env: Env):
         """
-        The evaluation of the meet operation over constant propagation follows
-        the lattice:
-                Not-a-constant (NAC)
-              /   /   /  | \  \  \ 
-            ... -c2 -c1 c0 c1 c2 ... 
-              \   \   \  | /  /  /  
-                Undefined (UNDEF)
+        Example:
+            >>> Inst.next_index = 0
+            >>> i0 = Add('x', 'x', 'ONE')
+            >>> i1 = Add('z', 'ONE', 'ONE')
+            >>> i2 = Mul('a', 'z', 'y')
+            >>> i3 = Lth('b', 'z', 'x')
 
-        Whereby variables start UNDEF untill value assignment, operations with
-        constants do not move them up the lattice and operations with NACs turn
-        them into NACs as well.
+            >>> i0.add_next(i1)
+            >>> i1.add_next(i2)
+            >>> i2.add_next(i3)
 
-        Each SparseConstantPropagation adds
+            >>> df0 = BinOpEq(i0)
+            >>> df1 = BinOpEq(i1)
+            >>> df2 = BinOpEq(i2)
+            >>> df3 = BinOpEq(i3)
 
+            >>> env = Env({'ZERO': 0, 'ONE': 1, 'x': 5, 'y': 'NAC'})
+            >>> _ = df0.eval(env)
+            >>> _ = df1.eval(env)
+            >>> _ = df2.eval(env)
+            >>> _ = df3.eval(env)
+            >>> sorted(env.to_dict().items())
+            [('ONE', 1), ('ZERO', 0), ('a', 'NAC'), ('b', 1), ('x', 6), ('y', 'NAC'), ('z', 2)]
+        """
+        # TODO: add expected result above
+        definition = self.inst.definition().pop()
+        for v in self.inst.uses():
+            if data_flow_env.get(v) == 'NAC':
+                data_flow_env.set(definition, 'NAC')
+                return
+
+        op = {
+                Add: lambda x, y: x+y,
+                Mul: lambda x, y: x*y,
+                Lth: lambda x, y: int(x<y),
+                Geq: lambda x, y: int(x>=y),
+        }
+
+        x = data_flow_env.get(self.inst.src0)
+        y = data_flow_env.get(self.inst.src1)
+        data_flow_env.set(definition, op[type(self.inst)](x,y))
+        # pass
+
+
+class ReadEq(SparseConstantPropagationEq):
+    def eval_aux(self, data_flow_env: Env):
+        """
         Example:
             >>> Inst.next_index = 0
             >>> i0 = Add('x', 'ZERO', 'ZERO')
             >>> i1 = Read('y')
             >>> i2 = Add('z', 'x', 'y')
+
             >>> i0.add_next(i1)
             >>> i1.add_next(i2)
-            >>> df = SparseConstantPropagation(i2)
-            >>> env = Env({'ZERO': 0, 'x': 0, 'y': 'NAC'})
+
+            >>> df = ReadEq(i1)
+            >>> env = Env({'ZERO': 0, 'x': 0})
             >>> df.eval_aux(env)
             >>> sorted(env.to_dict().items())
-            [('ZERO', 0), ('x', 0), ('y', 'NAC'), ('z', 'NAC')]
+            [('ZERO', 0), ('x', 0), ('y', 'NAC')]
         """
-        if type(self.inst) is Bt:
-            return
+        definition = self.inst.definition().pop()
+        data_flow_env.set(definition, 'NAC')
+        # pass
 
+
+class PhiEq(SparseConstantPropagationEq):
+    def eval_aux(self, data_flow_env: Env):
+        """
+        Example:
+            >>> Inst.next_index = 0
+            >>> i0 = Phi('x', 'const1', 'const2')
+            >>> i1 = Phi('y', 'const1', 'notconst')
+            >>> i2 = Phi('z', 'const1', 'const3')
+
+            >>> df0 = PhiEq(i0)
+            >>> df1 = PhiEq(i1)
+            >>> df2 = PhiEq(i2)
+            >>> env = Env({'const1': 0, 'const2': 0, 'const3': 1, 'notconst': 'NAC'})
+            >>> _ = df0.eval(env)
+            >>> _ = df1.eval(env)
+            >>> _ = df2.eval(env)
+            >>> sorted(env.to_dict().items())
+            [('const1', 0), ('const2', 0), ('const3', 1), ('notconst', 'NAC'), ('x', 0), ('y', 'NAC'), ('z', 'NAC')]
+        """
         def equal_env(acc_and_x, y):
             new_acc = acc_and_x[0] and \
                       data_flow_env.get_from_list(acc_and_x[1]) == \
@@ -173,45 +240,41 @@ class SparseConstantPropagation(SparseDataFlowEq):
             new_x = y
             return (new_acc, new_x)
 
-        op = {
-            Add:        lambda: data_flow_env.get(self.inst.src0) +
-                                data_flow_env.get(self.inst.src1),
-            Mul:        lambda: data_flow_env.get(self.inst.src0) *
-                                data_flow_env.get(self.inst.src1),
-            Bt:         lambda: 'NAC',
-            Lth:        lambda: int(data_flow_env.get(self.inst.src0) <
-                                    data_flow_env.get(self.inst.src1)),
-            Geq:        lambda: int(data_flow_env.get(self.inst.src0) >=
-                                    data_flow_env.get(self.inst.src1)),
-            Read:       lambda: 'NAC',
-            Phi:        lambda: data_flow_env.get_from_list(list(self.inst.uses())) \
-                                if reduce(
-                                    equal_env,
-                                    list(self.inst.uses()),
-                                    (True, list(self.inst.uses())[0])
-                                )[0]
-                                else 'NAC',
-        }
+        uselist = list(self.inst.uses())
+        definition = self.inst.definition().pop()
 
-        vs = self.inst.uses()
-        for v in vs:
-            if type(self.inst) is Phi:
-                if data_flow_env.get_from_list(v) == 'NAC':
-                    data_flow_env.set(self.inst.definition().pop(), 'NAC')
-                    return
-            else:
-                if data_flow_env.get(v) == 'NAC':
-                    data_flow_env.set(self.inst.definition().pop(), 'NAC')
-                    return
+        for v in uselist:
+            if data_flow_env.get_from_list(v) == 'NAC':
+                data_flow_env.set(definition, 'NAC')
+                return
 
-        data_flow_env.set(
-                self.inst.definition().pop(),
-                op[type(self.inst)]()
-        )
+        if reduce(
+                equal_env,
+                uselist,
+                (True, uselist[0])
+           )[0]:
+            phiValue = data_flow_env.get_from_list(uselist)
+            data_flow_env.set(definition, phiValue) 
+        else:
+            data_flow_env.set(definition, 'NAC')
+        # pass
 
 
 def constant_prop_constraint_gen(instructions: list[Inst]):
-    return [SparseConstantPropagation(i) for i in instructions]
+    equationMap = {
+        Add:    BinOpEq,
+        Mul:    BinOpEq,
+        Lth:    BinOpEq,
+        Geq:    BinOpEq,
+        Bt:     BranchEq,
+        Read:   ReadEq,
+        Phi:    PhiEq,
+    }
+ 
+    equations = []
+    for i in instructions:
+        equations.append(equationMap[type(i)](i))
+    return equations
 
 
 def abstract_interp(equations, program_env: Env):
