@@ -204,7 +204,7 @@ class Phi(Inst):
     that are related by phi-functions do not have overlapping live ranges.
 
     Example:
-        >>> a = Phi("a", ["b0", "b1", "b2"])
+        >>> a = Phi("a", "b0", "b1", "b2")
         >>> e = Env()
         >>> e.set("b0", 1)
         >>> e.set("b1", 3)
@@ -212,7 +212,7 @@ class Phi(Inst):
         >>> e.get("a")
         3
 
-        >>> a = Phi("a", ["b0", "b1"])
+        >>> a = Phi("a", "b0", "b1")
         >>> e = Env()
         >>> e.set("b1", 3)
         >>> e.set("b0", 1)
@@ -221,9 +221,9 @@ class Phi(Inst):
         1
     """
 
-    def __init__(s, dst, args):
+    def __init__(s, dst, *args):
         s.dst = dst
-        s.args = args
+        s.args = list(args)
         super().__init__()
 
     def definition(s):
@@ -239,8 +239,8 @@ class Phi(Inst):
         occurrence of each variable in the list of uses. However, notice what
         would happen with swaps:
 
-        >>> a0 = Phi("a0", ["a1", "a0"])
-        >>> a1 = Phi("a1", ["a0", "a1"])
+        >>> a0 = Phi("a0", "a1", "a0")
+        >>> a1 = Phi("a1", "a0", "a1")
         >>> e = Env()
         >>> e.set("a0", 1)
         >>> e.set("a1", 3)
@@ -267,7 +267,7 @@ class Phi(Inst):
         Example:
 
             >>> Inst.next_index = 0
-            >>> i0 = Phi("a", ["b0", "b1"])
+            >>> i0 = Phi("a", "b0", "b1")
             >>> e = TypeEnv()
             >>> e.set("b0", LangType.NUM)
             >>> e.set("b1", LangType.BOOL)
@@ -373,8 +373,8 @@ class PhiBlock(Inst):
     a look into Figure 1 of that paper.
 
     Example:
-        >>> a0 = Phi("a0", ["a0", "a1"])
-        >>> a1 = Phi("a1", ["a1", "a0"])
+        >>> a0 = Phi("a0", "a0", "a1")
+        >>> a1 = Phi("a1", "a1", "a0")
         >>> aa = PhiBlock([a0, a1], [10, 31])
         >>> e = Env()
         >>> e.set("a0", 1)
@@ -383,8 +383,8 @@ class PhiBlock(Inst):
         >>> e.get("a0") - e.get("a1")
         -2
 
-        >>> a0 = Phi("a0", ["a0", "a1"])
-        >>> a1 = Phi("a1", ["a1", "a0"])
+        >>> a0 = Phi("a0", "a0", "a1")
+        >>> a1 = Phi("a1", "a1", "a0")
         >>> aa = PhiBlock([a0, a1], [10, 31])
         >>> e = Env()
         >>> e.set("a0", 1)
@@ -445,8 +445,8 @@ class PhiBlock(Inst):
         is here rather to help understand the structure of phi-blocks.
 
         Example:
-            >>> a0 = Phi("a0", ["a0", "x"])
-            >>> a1 = Phi("a1", ["y", "a0"])
+            >>> a0 = Phi("a0", "a0", "x")
+            >>> a1 = Phi("a1", "y", "a0")
             >>> aa = PhiBlock([a0, a1], [10, 31])
             >>> sorted(aa.uses())
             ['a0', 'a0', 'x', 'y']
@@ -471,8 +471,8 @@ class PhiBlock(Inst):
 
         Example:
             >>> Inst.next_index = 0
-            >>> a0 = Phi("a0", ["a0", "a1"])
-            >>> a1 = Phi("a1", ["a1", "a0"])
+            >>> a0 = Phi("a0", "a0", "a1")
+            >>> a1 = Phi("a1", "a1", "a0")
             >>> aa = PhiBlock([a0, a1], [10, 31])
             >>> e = TypeEnv({"a0": LangType.NUM, "a1": LangType.BOOL})
             >>> aa.type_eval(e)
@@ -809,7 +809,15 @@ def interp(instruction: Inst, environment: Env, PC=0):
         return environment
 
 
-def type_check(instruction: Inst, type_env: TypeEnv):
+def type_check(instruction: Inst,
+               type_env: TypeEnv,
+               phi_queue: list[Inst] = []):
     if instruction:
+        if isinstance(instruction, PhiBlock) or \
+           isinstance(instruction, Phi):
+            phi_queue.append(instruction)
         instruction.type_eval(type_env)
-        return type_interp(instruction.get_next(), type_env)
+        type_check(instruction.get_next(), type_env)
+    else:
+        for phi in phi_queue:
+            phi.type_eval(type_env)
