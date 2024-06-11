@@ -1,22 +1,22 @@
-# Sparse Constant Propagation
-Diffenrently from classical Dataflow Analysis, when dealing with SSA-Form programs we may utilize [sparse analysis](https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/ementa/slides/SparseAbstractInterpretation.pdf). Since each variable is associated with a single state, the Dataflow result for each given variable depends only on its assigning instruction. Holding a global state for all program variables and updating it through each instruction is enough, and individual *IN* and *OUT* sets are no longer required.
-
-One classical example of Sparse Analysis applicability is *constant propagation*. Each variable throughout the SSA-Form program may be a constant, not-a-constant or undefined.
-
-- before assignment, all variables are undefined.
-- constant variables are the result of operations with other constants
-- not-a-constant (NAC) variables are the result of user input or operations including at least one NAC.
+# Type Checking
+As with semantic rules, a program may also be interpreted with a set of type rules applyable to the same syntax.
 
 ## The Assignment
+In this lab we must built a simple type-checker in the model language. In order to do this, a new set of features has been implemented:
+- A new TypeEnv extends the Env class and is restricted for type-checking.
+- A new InstTypeErr describes when a given program has a type-invalid instruction
+- Read instruction has been split into the typed instructions ReadNum and ReadBool
+- All instructions (Add, Mul, Lth, Geq, Bt, Phi, PhiBlock, ReadNum, ReadBool) have a `type_eval` method.
+- A new global `type_check` function.
 
-In this lab we shall implement a sparse data-flow analysis for constant propagation.
-Similarly to previous labs, a [parser implementation](../Parsing) is required.
-Additionally, [phi functions](../PhiFunctions) are also required.
-Thus, as a preliminary step, rename your parser, from that lab, from `todo.py` to `parser.py`. Next, copy the respective PhiFunction's `lang.py` into this lab.
-The parser is the only file from the previous lab that you should reuse.
+In order to implement the type-checker, all `type_eval` methods must be implemented. If an instruction instance leads up to a stuck state, an `InstTypeErr` exception must be raised. Furthermore, the `type_check` function must iterate over the program and, by using `type_eval`, verify if the whole program is sound. Be mindful of Phi and PhiBlock instructions.
 
-This lab requires implementing the `SparseConstantPropagation`'s `eval_aux` function. This function will hold all rules for this analysis.
-![Constant Propagation Rules](../assets/images/constantprop.png)
+Besides the `driver.py` and `lang.py` modules, the following files are required:
+- A [parser implementation](../Parsing).
+- [phi functions](../PhiFunctions) should be fully implemented.
+
+Thus, as a preliminary step, rename your parser, from that lab, from `todo.py` to `parser.py`. In order to have functional Phi functions, their `eval` methods may be copied from previous exercises - our goal is to maintain a usable language.
+
 
 > Observe that `abstract_interp` requires an `Env` parameter. This is due to the fact that this analysis must actually calculate operations among constants. This should be the same environment read from the original program - this is safe, the function operates over a copy of this object.
 
