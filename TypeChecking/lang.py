@@ -277,6 +277,7 @@ class Phi(Inst):
             lang.InstTypeErr: Type error in instruction 0
             Expected: LangType.NUM, found: LangType.BOOL
         """
+        # TODO: implement this method
         uses = s.args
         t = type_env.get_from_list(uses[0])
         for u in uses:
@@ -309,6 +310,9 @@ class ReadNum(Inst):
         return set()
 
     def eval(s, env):
+        """
+        For simplicity, ReadNum fails with any value other than ints
+        """
         input_value = input(f'value for {s.dst}: ')
         if type(input_value) is not int:
             raise InstTypeErr(s, int, type(input_value))
@@ -340,6 +344,9 @@ class ReadBool(Inst):
         return set()
 
     def eval(s, env):
+        """
+        For simplicity, ReadBool fails with any value other than bool
+        """
         input_value = input(f'value for {s.dst}: ')
         if type(input_value) is not bool:
             raise InstTypeErr(s, bool, type(input_value))
@@ -457,7 +464,24 @@ class PhiBlock(Inst):
             d = phi.definition().pop()
             env.set(d, defs[d])
 
-    def type_eval(s, type_env, PC):
+    def type_eval(s, type_env):
+        """
+        For type checking, it is sufficient to assure that all Phi arguments
+        belong to the same type.
+
+        Example:
+            >>> Inst.next_index = 0
+            >>> a0 = Phi("a0", ["a0", "a1"])
+            >>> a1 = Phi("a1", ["a1", "a0"])
+            >>> aa = PhiBlock([a0, a1], [10, 31])
+            >>> e = TypeEnv({"a0": LangType.NUM, "a1": LangType.BOOL})
+            >>> aa.type_eval(e)
+            Traceback (most recent call last):
+             ...
+            lang.InstTypeErr: Type error in instruction 0
+            Expected: LangType.NUM, found: LangType.BOOL
+        """
+        # TODO: implement this method
         for phi in s.phis:
             phi.type_eval(type_env)
 
@@ -516,6 +540,24 @@ class Add(BinOp):
         env.set(self.dst, env.get(self.src0) + env.get(self.src1))
 
     def type_eval(s, type_env):
+        """
+        Additions will always require and result in a numerical value:
+            >>> Inst.next_index = 0
+            >>> a = Add("a", "b0", "b1")
+            >>> e = TypeEnv({"b0": LangType.NUM, "b1": LangType.BOOL})
+            >>> a.type_eval(e)
+            Traceback (most recent call last):
+             ...
+            lang.InstTypeErr: Type error in instruction 0
+            Expected: LangType.NUM, found: LangType.BOOL
+
+            >>> a = Add("a", "b0", "b1")
+            >>> e = TypeEnv({"b0": LangType.NUM, "b1": LangType.NUM})
+            >>> a.type_eval(e)
+            >>> print(e.get("a"))
+            LangType.NUM
+        """
+        # TODO: implement this method
         for u in s.uses():
             t = type_env.get(u)
             if t != LangType.NUM:
@@ -540,6 +582,24 @@ class Mul(BinOp):
         env.set(s.dst, env.get(s.src0) * env.get(s.src1))
 
     def type_eval(s, type_env):
+        """
+        Multiplications will always require and result in a numerical value:
+            >>> Inst.next_index = 0
+            >>> a = Mul("a", "b0", "b1")
+            >>> e = TypeEnv({"b0": LangType.NUM, "b1": LangType.BOOL})
+            >>> a.type_eval(e)
+            Traceback (most recent call last):
+             ...
+            lang.InstTypeErr: Type error in instruction 0
+            Expected: LangType.NUM, found: LangType.BOOL
+
+            >>> a = Mul("a", "b0", "b1")
+            >>> e = TypeEnv({"b0": LangType.NUM, "b1": LangType.NUM})
+            >>> a.type_eval(e)
+            >>> print(e.get("a"))
+            LangType.NUM
+        """
+        # TODO: implement this method
         for u in s.uses():
             t = type_env.get(u)
             if t != LangType.NUM:
@@ -564,6 +624,24 @@ class Lth(BinOp):
         env.set(s.dst, env.get(s.src0) < env.get(s.src1))
 
     def type_eval(s, type_env):
+        """
+        Comparisons will always require numerical values and output booleans:
+            >>> Inst.next_index = 0
+            >>> a = Lth("a", "b0", "b1")
+            >>> e = TypeEnv({"b0": LangType.NUM, "b1": LangType.BOOL})
+            >>> a.type_eval(e)
+            Traceback (most recent call last):
+             ...
+            lang.InstTypeErr: Type error in instruction 0
+            Expected: LangType.NUM, found: LangType.BOOL
+
+            >>> a = Lth("a", "b0", "b1")
+            >>> e = TypeEnv({"b0": LangType.NUM, "b1": LangType.NUM})
+            >>> a.type_eval(e)
+            >>> print(e.get("a"))
+            LangType.BOOL
+        """
+        # TODO: implement this method
         for u in s.uses():
             t = type_env.get(u)
             if t != LangType.NUM:
@@ -588,6 +666,24 @@ class Geq(BinOp):
         env.set(s.dst, env.get(s.src0) >= env.get(s.src1))
 
     def type_eval(s, type_env):
+        """
+        Comparisons will always require numerical values and output booleans:
+            >>> Inst.next_index = 0
+            >>> a = Geq("a", "b0", "b1")
+            >>> e = TypeEnv({"b0": LangType.NUM, "b1": LangType.BOOL})
+            >>> a.type_eval(e)
+            Traceback (most recent call last):
+             ...
+            lang.InstTypeErr: Type error in instruction 0
+            Expected: LangType.NUM, found: LangType.BOOL
+
+            >>> a = Geq("a", "b0", "b1")
+            >>> e = TypeEnv({"b0": LangType.NUM, "b1": LangType.NUM})
+            >>> a.type_eval(e)
+            >>> print(e.get("a"))
+            LangType.BOOL
+        """
+        # TODO: implement this method
         for u in s.uses():
             t = type_env.get(u)
             if t != LangType.NUM:
@@ -651,6 +747,20 @@ class Bt(Inst):
             s.next_iter = 1
 
     def type_eval(s, type_env):
+        """
+        Branch instructions require boolean conditions:
+            >>> Inst.next_index = 0
+            >>> a = Add("x", "x", "x")
+            >>> m = Mul("x", "x", "x")
+            >>> b = Bt("t", a, m)
+            >>> e = TypeEnv({"t": LangType.NUM})
+            >>> b.type_eval(e)
+            Traceback (most recent call last):
+             ...
+            lang.InstTypeErr: Type error in instruction 2
+            Expected: LangType.BOOL, found: LangType.NUM
+        """
+        # TODO: implement this method
         t = type_env.get(s.cond)
         if t != LangType.BOOL:
             raise InstTypeErr(s, LangType.BOOL, t)
