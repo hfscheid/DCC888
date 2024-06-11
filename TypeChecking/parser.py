@@ -13,7 +13,7 @@ As an example, the program below sums up the numbers a, b and c:
     l2 = x = add x c
 """
 
-from lang import Env, Inst, Add, Mul, Lth, Geq, Read, Phi, Bt
+from lang import Env, Inst, Add, Mul, Lth, Geq, ReadNum, ReadBool, Phi, Bt
 
 
 def line2env(line: str) -> Env:
@@ -71,9 +71,9 @@ def file2cfg_and_env(lines: list[str]) -> tuple[Env, list[Inst]]:
         "mul":  Mul,
         "lth":  Lth,
         "geq":  Geq,
-        "rd":   Read,
+        "rdn":   ReadNum,
+        "rdb":   ReadBool,
         "phi":  Phi,
-        "rd":   Read,
     }
 
     env = line2env(lines[0])
@@ -91,7 +91,7 @@ def file2cfg_and_env(lines: list[str]) -> tuple[Env, list[Inst]]:
         insts.append(inst)
 
     for bt_tuple in bt_list:
-        bt = bt_tuple[0] 
+        bt = bt_tuple[0]
         bt.add_true_next(insts[int(bt_tuple[1])])
 
     for i in range(len(insts)-1):

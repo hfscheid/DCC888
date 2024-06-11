@@ -26,13 +26,6 @@ class LangType(Enum):
     BOOL = 2
 
 
-class WrongEnvType(Exception):
-    def __init__(s, inst: Inst, expected: LangType, found: Langtype):
-        message = f'Type error in instruction {inst.ID}\n' \
-                  f'Expected: {expected}, found: {found}'
-        super.__init__(message)
-
-
 class Env:
     """
     A table that associates variables with values. The environment is
@@ -93,7 +86,7 @@ class Env:
         for (var, value) in self.env:
             if var in vars:
                 return value
-        return 0
+        return None
 
     def set(s, var, value):
         """
@@ -113,13 +106,29 @@ class Env:
     def to_dict(s):
         d = dict()
         for var, value in reversed(s.env):
-            d[var] = value 
-        return d 
+            d[var] = value
+        return d
+
+
+class TypeEnvErr(Exception):
+    pass
 
 
 class TypeEnv(Env):
-    class TypeEnvErr(Exception):
-        pass
+
+    @classmethod
+    def from_env(cls, env: Env):
+        d = env.to_dict()
+        type_d = dict()
+        for k, v in d.items():
+            t = type(v)
+            if t is int:
+                type_d[k] = LangType.NUM
+            elif t is bool:
+                type_d[k] = LangType.BOOL
+            else:
+                raise TypeEnvErr
+        return TypeEnv(type_d)
 
     def set(s, var, value: LangType):
         """
@@ -168,6 +177,13 @@ class Inst(ABC):
             return self.nexts[0]
         else:
             return None
+
+
+class InstTypeErr(Exception):
+    def __init__(s, inst: Inst, expected: LangType, found: LangType):
+        message = f'Type error in instruction {inst.ID}\n' \
+                  f'Expected: {expected}, found: {found}'
+        super().__init__(message)
 
 
 class Phi(Inst):
@@ -242,11 +258,12 @@ class Phi(Inst):
         env.set(s.dst, env.get_from_list(s.uses()))
 
     def type_eval(s, type_env):
-        uses = type_env.get_from_list(s.uses())
-        t = uses[0]
-        for _t in uses:
-            if _t != t:
-                raise WrongEnvType(s, t, _t)
+        uses = s.args
+        t = type_env.get_from_list(uses[0])
+        for u in uses:
+            _t = type_env.get_from_list(u)
+            if _t and _t != t:
+                raise InstTypeErr(s, t, _t)
         type_env.set(s.dst, t)
 
     def __str__(self):
@@ -275,11 +292,42 @@ class ReadNum(Inst):
     def eval(s, env):
         input_value = input(f'value for {s.dst}: ')
         if type(input_value) is not int:
-            raise WrongEnvType(s, int, type(input_value))
+            raise InstTypeErr(s, int, type(input_value))
         env.set(s.dst, int(input_value))
 
     def type_eval(s, type_env):
         type_env.set(s.dst, LangType.NUM)
+
+    def __str__(self):
+        inst_s = f"{self.ID}: {self.dst} = INPUT"
+        pred_s = f"\n  P: {', '.join([str(inst.ID) for inst in self.preds])}"
+        next_s = f"\n  N: {self.nexts[0].ID if len(self.nexts) > 0 else ''}"
+        return inst_s + pred_s + next_s
+
+
+class ReadBool(Inst):
+    """
+    The ReadNum instruction introduces non-constant values to the program.
+    This blocking instruction requests a numerical input from the user.
+    """
+    def __init__(s, dst):
+        s.dst = dst
+        super().__init__()
+
+    def definition(s):
+        return {s.dst}
+
+    def uses(s):
+        return set()
+
+    def eval(s, env):
+        input_value = input(f'value for {s.dst}: ')
+        if type(input_value) is not bool:
+            raise InstTypeErr(s, bool, type(input_value))
+        env.set(s.dst, int(input_value))
+
+    def type_eval(s, type_env):
+        type_env.set(s.dst, LangType.BOOL)
 
     def __str__(self):
         inst_s = f"{self.ID}: {self.dst} = INPUT"
@@ -448,11 +496,11 @@ class Add(BinOp):
     def eval(self, env):
         env.set(self.dst, env.get(self.src0) + env.get(self.src1))
 
-    def type_env(s, type_env):
+    def type_eval(s, type_env):
         for u in s.uses():
             t = type_env.get(u)
             if t != LangType.NUM:
-                raise WrongEnvType(s, LangType.NUM, t)
+                raise InstTypeErr(s, LangType.NUM, t)
         type_env.set(s.dst, LangType.NUM)
 
     def get_opcode(self):
@@ -472,11 +520,11 @@ class Mul(BinOp):
     def eval(s, env):
         env.set(s.dst, env.get(s.src0) * env.get(s.src1))
 
-    def type_env(s, type_env):
+    def type_eval(s, type_env):
         for u in s.uses():
             t = type_env.get(u)
             if t != LangType.NUM:
-                raise WrongEnvType(s, LangType.NUM, t)
+                raise InstTypeErr(s, LangType.NUM, t)
         type_env.set(s.dst, LangType.NUM)
 
     def get_opcode(self):
@@ -496,11 +544,11 @@ class Lth(BinOp):
     def eval(s, env):
         env.set(s.dst, env.get(s.src0) < env.get(s.src1))
 
-    def type_env(s, type_env):
+    def type_eval(s, type_env):
         for u in s.uses():
             t = type_env.get(u)
             if t != LangType.NUM:
-                raise WrongEnvType(s, LangType.NUM, t)
+                raise InstTypeErr(s, LangType.NUM, t)
         type_env.set(s.dst, LangType.BOOL)
 
     def get_opcode(self):
@@ -520,11 +568,11 @@ class Geq(BinOp):
     def eval(s, env):
         env.set(s.dst, env.get(s.src0) >= env.get(s.src1))
 
-    def type_env(s, type_env):
+    def type_eval(s, type_env):
         for u in s.uses():
             t = type_env.get(u)
             if t != LangType.NUM:
-                raise WrongEnvType(s, LangType.NUM, t)
+                raise InstTypeErr(s, LangType.NUM, t)
         type_env.set(s.dst, LangType.BOOL)
 
     def get_opcode(self):
@@ -551,6 +599,7 @@ class Bt(Inst):
         super().__init__()
         s.cond = cond
         s.nexts = [true_dst, false_dst]
+        s.next_iter = 1  # By default, perform no jump
         if true_dst != None:
             true_dst.preds.append(s)
         if false_dst != None:
@@ -582,11 +631,10 @@ class Bt(Inst):
         else:
             s.next_iter = 1
 
-    def type_env(s, type_env):
-        for u in s.uses():
-            t = type_env.get(u)
-            if t != LangType.BOOL:
-                raise WrongEnvType(s, LangType.BOOL, t)
+    def type_eval(s, type_env):
+        t = type_env.get(s.cond)
+        if t != LangType.BOOL:
+            raise InstTypeErr(s, LangType.BOOL, t)
 
     def get_next(s):
         return s.nexts[s.next_iter]
@@ -632,7 +680,7 @@ def interp(instruction: Inst, environment: Env, PC=0):
         return environment
 
 
-def type_interp(instruction: Inst, type_env: TypeEnv, PC=0):
+def type_interp(instruction: Inst, type_env: TypeEnv):
     if instruction:
         instruction.type_eval(type_env)
-        return interp(instruction.get_next(), type_env, instruction.ID)
+        return type_interp(instruction.get_next(), type_env)

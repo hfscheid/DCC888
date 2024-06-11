@@ -1,4 +1,4 @@
-{"zero": 0, "one": 1, "two": 2, "three": 3, "mintwo": -2}
+{"true": true, "zero": 0, "one": 1, "two": 2, "three": 3, "mintwo": -2}
 sub = add three mintwo
 pred = lth sub one
 bt pred 11
@@ -10,7 +10,7 @@ prod2 = mul prod1 two
 count2 = add count1 one
 repeat0 = geq three count2
 bt repeat0 5
-bt one 19
+bt true 19
 fib0 = add zero one
 count3 = add zero one
 count4 = phi count3 count5
