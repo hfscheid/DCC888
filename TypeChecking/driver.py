@@ -2,12 +2,12 @@
 import sys
 import lang
 import parser
-import dataflow
 
 if __name__ == "__main__":
     lang.Inst.next_index = 0
     lines = sys.stdin.readlines()
     env, program = parser.file2cfg_and_env(lines)
-    equations = dataflow.constant_prop_constraint_gen(program)
-    result_env, _ = dataflow.abstract_interp(equations, env)
-    print(result_env.to_dict())
+    try:
+        lang.type_check(program[0], lang.TypeEnv.from_env(env))
+    except lang.InstTypeErr as e:
+        print(e)

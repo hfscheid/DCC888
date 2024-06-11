@@ -181,6 +181,9 @@ class Inst(ABC):
 
 class InstTypeErr(Exception):
     def __init__(s, inst: Inst, expected: LangType, found: LangType):
+        s.inst = inst
+        s.expected = expected
+        s.found = found
         message = f'Type error in instruction {inst.ID}\n' \
                   f'Expected: {expected}, found: {found}'
         super().__init__(message)
@@ -218,7 +221,7 @@ class Phi(Inst):
         1
     """
 
-    def __init__(s, dst, *args):
+    def __init__(s, dst, args):
         s.dst = dst
         s.args = args
         super().__init__()
@@ -227,7 +230,7 @@ class Phi(Inst):
         return set([s.dst])
 
     def uses(s):
-        return set(s.args)
+        return s.args
 
     def eval(s, env):
         """
@@ -258,6 +261,22 @@ class Phi(Inst):
         env.set(s.dst, env.get_from_list(s.uses()))
 
     def type_eval(s, type_env):
+        """
+        Assume that our language does not allow for type changes in variables.
+        Thus, all arguments in a Phi-Function must belong to the same type.
+        Example:
+
+            >>> Inst.next_index = 0
+            >>> i0 = Phi("a", ["b0", "b1"])
+            >>> e = TypeEnv()
+            >>> e.set("b0", LangType.NUM)
+            >>> e.set("b1", LangType.BOOL)
+            >>> i0.type_eval(e)
+            Traceback (most recent call last):
+             ...
+            lang.InstTypeErr: Type error in instruction 0
+            Expected: LangType.NUM, found: LangType.BOOL
+        """
         uses = s.args
         t = type_env.get_from_list(uses[0])
         for u in uses:
@@ -385,7 +404,7 @@ class PhiBlock(Inst):
             >>> a0 = Phi("a0", ["a0", "a1"])
             >>> a1 = Phi("a1", ["a1", "a0"])
             >>> aa = PhiBlock([a0, a1], [10, 31])
-            >>> sorted([phi.definition() for phi in aa.phis])
+            >>> sorted([phi.definition().pop() for phi in aa.phis])
             ['a0', 'a1']
         """
         self.phis = phis
@@ -410,7 +429,7 @@ class PhiBlock(Inst):
             >>> sorted(aa.definition())
             ['a0', 'a1']
         """
-        return [phi.definition() for phi in self.phis]
+        return [phi.definition().pop() for phi in self.phis]
 
     def uses(self):
         """
@@ -431,15 +450,15 @@ class PhiBlock(Inst):
         # TODO: Read all the definitions
         defs = dict()
         for phi in self.phis:
-            d = phi.definition()
+            d = phi.definition().pop()
             defs[d] = env.get(phi.uses()[self.selectors[PC]])
         # TODO: Assign all the uses:
         for phi in self.phis:
-            d = phi.definition()
+            d = phi.definition().pop()
             env.set(d, defs[d])
 
     def type_eval(s, type_env, PC):
-        for phi in self.phis:
+        for phi in s.phis:
             phi.type_eval(type_env)
 
     def __str__(self):
@@ -680,7 +699,7 @@ def interp(instruction: Inst, environment: Env, PC=0):
         return environment
 
 
-def type_interp(instruction: Inst, type_env: TypeEnv):
+def type_check(instruction: Inst, type_env: TypeEnv):
     if instruction:
         instruction.type_eval(type_env)
         return type_interp(instruction.get_next(), type_env)
