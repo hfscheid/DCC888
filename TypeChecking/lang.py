@@ -812,6 +812,7 @@ def interp(instruction: Inst, environment: Env, PC=0):
 def type_check(instruction: Inst,
                type_env: TypeEnv,
                phi_queue: list[Inst] = []):
+    # TODO: implement type checking
     if instruction:
         if isinstance(instruction, PhiBlock) or \
            isinstance(instruction, Phi):
