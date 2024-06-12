@@ -61,3 +61,8 @@ In this [lab](/PhiFunctions), the student will add phi-functions to our toy thre
 ### Alias Analysis
 
 In this [lab](/AliasAnalysis), the student will implement a version of Andersen-style Alias Analysis, following the lecture notes seen in [class](https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/ementa/slides/PointerAnalysis.pdf).
+
+
+### Type Checking
+
+In this [lab](/TypeChecking), the student will implement Type-Checking to verify if programs are **Safe**, as seen in [class](https://homepages.dcc.ufmg.br/~fernando/classes/dcc888/ementa/slides/TypeSystems.pdf)

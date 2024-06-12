@@ -55,5 +55,3 @@ To simulate automatic grading, you can run [drive.py](driver.py) directly, e.g.:
 ```
 python3 driver.py < tests/fib.txt
 ```
-
-In this exercise, the driver prints the dominance tree of each program.
