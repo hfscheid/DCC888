@@ -1,5 +1,5 @@
 {"one": 1, "two": 2, "minone": -1}
-num0 = rd
+num0 = rdn
 mintwo = mul minone two
 num1 = phi num0 num2
 l = lth num1 two
