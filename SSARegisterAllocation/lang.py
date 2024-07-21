@@ -55,6 +55,9 @@ class Env:
         Finds the first occurrence of variable 'var' in the environment stack,
         and returns the value associated with it.
         """
+        if type(var) in (int, float):
+            return var
+
         val = next((value for (e_var, value) in self.env if e_var == var), None)
         if val is not None:
             return val
@@ -86,6 +89,9 @@ class Env:
         for (var, value) in self.env:
             if var in vars:
                 return value
+        for var in vars:
+            if type(var) in (int, float):
+                return var
         return None
 
     def set(s, var, value):
@@ -230,7 +236,11 @@ class Phi(Inst):
         return set([s.dst])
 
     def uses(s):
-        return set(s.args)
+        use_set = set()
+        for arg in s.args:
+            if type(arg) not in (int, float):
+                use_set.add(arg)
+        return use_set
 
     def eval(s, env):
         """
@@ -258,7 +268,7 @@ class Phi(Inst):
         program is not in conventional SSA-form (as per Definition 1 in the
         paper 'SSA Elimination after Register Allocation' - 2009).
         """
-        env.set(s.dst, env.get_from_list(s.uses()))
+        env.set(s.dst, env.get_from_list(s.args))
 
     def type_eval(s, type_env):
         """
@@ -512,7 +522,11 @@ class BinOp(Inst):
         return set([s.dst])
 
     def uses(s):
-        return set([s.src0, s.src1])
+        use_set = set()
+        for src in [s.src0, s.src1]:
+            if type(src) not in (int, float):
+                use_set.add(src)
+        return use_set
 
     def __str__(self):
         op = self.get_opcode()
