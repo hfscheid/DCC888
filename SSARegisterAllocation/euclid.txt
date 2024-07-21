@@ -1,0 +1,10 @@
+{"result": 0, "remainder": 0, "n": 15, "d": 5, "minone": -1, "one": 1, "zero": 0}
+z = lth n d
+bt z 7
+negd = mul d minone
+result = add result one
+n = add n negd
+l = geq n d
+bt l 3
+remainder = add remainder n
+end = add zero zero
