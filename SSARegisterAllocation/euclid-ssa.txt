@@ -1,9 +1,9 @@
-{"result0": 0, "n": 14, "d": 5, "minone": -1, "one": 1, "zero": 0}
-z = lth n d
+{"result0": 0, "n0": 14, "d": 5, "minone": -1, "one": 1, "zero": 0}
+z = lth n0 d
 bt z 10
 negd = mul d minone
 result1 = phi result0 result2
-n1 = phi n n2
+n1 = phi n0 n2
 result2 = add result1 one
 n2 = add n1 negd
 l = geq n2 d
