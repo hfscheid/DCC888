@@ -7,12 +7,14 @@ class MCSGraph:
     def __init__(s, program: list[Inst]):
         liveness = abstract_interp(liveness_constraint_gen(program))
         s.graph = defaultdict(lambda: set())
-        s.weights = defaultdict(lambda: 0)
+        s.weights = dict()
         s.maxweight = 0
         # build intersection graph
         for values in liveness.values():
             for var in values:
-                s.V[var] |= set(values)
+                s.graph[var] |= set(values)
+        for var in s.graph.keys():
+            s.weights[var] = 0
         s.weightedVs = sorted(s.weights.keys(), key=lambda x: s.weights[x])
 
     def N(s, v: str) -> set[str]:
@@ -27,8 +29,9 @@ class MCSGraph:
         pop = s.weightedVs.pop(0)
         del s.graph[pop]
         del s.weights[pop]
-        for k, v in s.graph.items():
-            s.graph[k].remove(pop)
+        for k in s.graph.keys():
+            s.graph[k] -= set([pop])
+        s.update(pop)
         return pop
 
     def size(s):
@@ -58,9 +61,7 @@ def MaximumCardinalitySearch(program: list[Inst]):
         >>> prog = [i0, i1, i2, i3, i4, i5, i6, i7, i8, i9, i10]
         >>> for i in range(9):
         ...     prog[i].add_next(prog[i+1])
-        >>> eqs = liveness_constraint_gen(prog)
-        >>> liveness = abstract_interp(eqs)
-        >>> liveness
+        >>> MaximumCardinalitySearch(prog)
     """
     g = MCSGraph(program)
     sequence = list()
