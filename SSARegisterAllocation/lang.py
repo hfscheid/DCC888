@@ -55,7 +55,7 @@ class Env:
         Finds the first occurrence of variable 'var' in the environment stack,
         and returns the value associated with it.
         """
-        if type(var) in (int, float):
+        if type(var) in (int, float, bool):
             return var
 
         val = next((value for (e_var, value) in self.env if e_var == var), None)
@@ -90,7 +90,7 @@ class Env:
             if var in vars:
                 return value
         for var in vars:
-            if type(var) in (int, float):
+            if type(var) in (int, float, bool):
                 return var
         return None
 
@@ -238,7 +238,7 @@ class Phi(Inst):
     def uses(s):
         use_set = set()
         for arg in s.args:
-            if type(arg) not in (int, float):
+            if type(arg) not in (int, float, bool):
                 use_set.add(arg)
         return use_set
 
@@ -524,7 +524,7 @@ class BinOp(Inst):
     def uses(s):
         use_set = set()
         for src in [s.src0, s.src1]:
-            if type(src) not in (int, float):
+            if type(src) not in (int, float, bool):
                 use_set.add(src)
         return use_set
 
