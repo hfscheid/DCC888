@@ -10,7 +10,7 @@ prod2 = mul prod1 two
 count2 = add count1 one
 repeat0 = geq three count2
 bt repeat0 5
-bt true 19
+bt true 21
 fib0 = add zero one
 count3 = add zero one
 count4 = phi count3 count5
